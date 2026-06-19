@@ -6,7 +6,7 @@ charset-normalizer==3.4.7
 click==8.3.1
 clipboard==0.0.4
 colorama==0.4.6
-Django==6.0
+Django>=5.1,<6.0
 djangorestframework==3.17.1
 dotenv==0.9.9
 Flask==3.1.2
