@@ -76,13 +76,15 @@ WSGI_APPLICATION = 'hostelhub.wsgi.application'
 
 import dj_database_url
 
+db_url = os.environ.get('DATABASE_URL', f"sqlite:///{BASE_DIR / 'db.sqlite3'}")
 DATABASES = {
     'default': dj_database_url.config(
-        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
+        default=db_url,
         conn_max_age=600,
-        ssl_require=False if os.environ.get('DATABASE_URL', '').startswith('sqlite') else True
+        ssl_require=False if db_url.startswith('sqlite') else True
     )
 }
+
 
 
 
