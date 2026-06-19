@@ -1,0 +1,152 @@
+{% extends 'base/base.html' %}
+{% block title %}Sign Up — HostelHub{% endblock %}
+
+{% block extra_css %}
+<style>
+  body { background: #0a0a0f; }
+  .auth-card {
+    background: #1a1a26; border: 1px solid #2a2a3d;
+    border-radius: 24px; padding: 40px;
+    box-shadow: 0 0 60px rgba(124,106,255,.1);
+  }
+  .form-control {
+    background: rgba(255,255,255,.05); border: 1.5px solid #2a2a3d;
+    color: #f0eeff; border-radius: 11px; padding: 12px 16px;
+  }
+  .form-control:focus {
+    background: rgba(124,106,255,.07);
+    border-color: #7c6aff; color: #f0eeff;
+    box-shadow: 0 0 0 3px rgba(124,106,255,.15);
+  }
+  .form-label { color: #7a7890; font-size: 12px;
+    text-transform: uppercase; letter-spacing: .06em; font-weight: 500; }
+  .role-card {
+    border: 1.5px solid #2a2a3d; border-radius: 12px; padding: 16px;
+    cursor: pointer; transition: all .2s; color: #7a7890; text-align: center;
+  }
+  .role-card:hover, .role-card.selected {
+    border-color: #7c6aff; background: rgba(124,106,255,.1); color: #f0eeff;
+  }
+  .btn-signup {
+    background: linear-gradient(135deg,#7c6aff,#ff6a9d);
+    border: none; border-radius: 12px; padding: 14px;
+    font-family: 'Syne', sans-serif; font-weight: 700; font-size: 16px;
+    width: 100%; color: white; cursor: pointer;
+  }
+  .strength-bar { height: 3px; background: #2a2a3d; border-radius: 3px; margin-top: 6px; }
+  .strength-fill { height: 100%; border-radius: 3px; width: 0; transition: all .3s; }
+  .auth-link { color: #7c6aff; text-decoration: none; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+
+      <div class="text-center mb-4">
+        <h1 class="text-white" style="font-family:Syne,sans-serif;font-weight:800">
+          🏠 HostelHub
+        </h1>
+        <p class="text-secondary">Create your free account</p>
+      </div>
+
+      <div class="auth-card">
+        <form method="POST" id="signupForm">
+          {% csrf_token %}
+
+          <!-- Role selector (hidden input updated by JS) -->
+          <input type="hidden" name="role" id="roleInput" value="student">
+          <p class="text-secondary mb-2" style="font-size:12px;text-transform:uppercase;letter-spacing:.06em">I am a</p>
+          <div class="row g-2 mb-4">
+            <div class="col-6">
+              <div class="role-card selected" onclick="setRole('student', this)">
+                <div style="font-size:24px">🎓</div>
+                <div style="font-weight:600;font-size:14px;margin-top:4px">Student</div>
+                <div style="font-size:11px;opacity:.7">Find & book hostels</div>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="role-card" onclick="setRole('owner', this)">
+                <div style="font-size:24px">🏢</div>
+                <div style="font-weight:600;font-size:14px;margin-top:4px">Hostel Owner</div>
+                <div style="font-size:11px;opacity:.7">List my property</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row g-3">
+            <div class="col-6">
+              <label class="form-label">First name</label>
+              <input type="text" name="first_name" class="form-control" placeholder="Ravi" required>
+            </div>
+            <div class="col-6">
+              <label class="form-label">Last name</label>
+              <input type="text" name="last_name" class="form-control" placeholder="Kumar" required>
+            </div>
+            <div class="col-12">
+              <label class="form-label">Username</label>
+              <input type="text" name="username" class="form-control" placeholder="ravikumar" required>
+            </div>
+            <div class="col-12">
+              <label class="form-label">Email</label>
+              <input type="email" name="email" class="form-control" placeholder="ravi@example.com" required>
+            </div>
+            <div class="col-12">
+              <label class="form-label">Phone (optional)</label>
+              <input type="tel" name="phone" class="form-control" placeholder="+91 9876543210">
+            </div>
+            <div class="col-12">
+              <label class="form-label">Password</label>
+              <input type="password" name="password1" id="pwd" class="form-control"
+                     placeholder="Min. 8 characters" oninput="checkStrength(this.value)" required>
+              <div class="strength-bar mt-2">
+                <div class="strength-fill" id="strengthFill"></div>
+              </div>
+            </div>
+            <div class="col-12">
+              <label class="form-label">Confirm password</label>
+              <input type="password" name="password2" class="form-control"
+                     placeholder="Repeat password" required>
+            </div>
+          </div>
+
+          {% if form.errors %}
+          <div class="alert alert-danger mt-3 py-2" style="font-size:13px;border-radius:10px">
+            {% for field in form %}{% for err in field.errors %}{{ err }}<br>{% endfor %}{% endfor %}
+          </div>
+          {% endif %}
+
+          <button type="submit" class="btn-signup mt-4">Create my account →</button>
+          <p class="text-center mt-3" style="font-size:13px;color:#7a7890">
+            Already have an account? <a href="{% url 'login' %}" class="auth-link">Sign in</a>
+          </p>
+        </form>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function setRole(role, el) {
+  document.getElementById('roleInput').value = role;
+  document.querySelectorAll('.role-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+}
+function checkStrength(val) {
+  const fill = document.getElementById('strengthFill');
+  let s = 0;
+  if (val.length >= 8) s++;
+  if (/[A-Z]/.test(val)) s++;
+  if (/[0-9]/.test(val)) s++;
+  if (/[^A-Za-z0-9]/.test(val)) s++;
+  const colors = ['#ff4d6d','#ff9f43','#ffd32a','#6affd4'];
+  const widths  = ['25%','50%','75%','100%'];
+  fill.style.width      = val.length ? (widths[s-1] || '10%') : '0';
+  fill.style.background = val.length ? (colors[s-1] || '#ff4d6d') : 'transparent';
+}
+</script>
+{% endblock %}

@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}HostelHub — Premium Hostel Bookings{% endblock %}</title>
+  
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  <!-- Google Fonts: Inter & Sora -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Sora:wght@500;600;700;800&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --primary: #1A3C5E;     /* Deep navy */
+      --primary-dark: #0f243a;
+      --accent: #F4A228;      /* Warm amber */
+      --accent-hover: #e0901b;
+      --bg-light: #F8FAFC;    /* Soft off-white */
+      --text-dark: #1E293B;
+      --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+      --transition: all 0.25s ease-in-out;
+    }
+    
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg-light);
+      color: var(--text-dark);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    h1, h2, h3, h4, h5, h6, .headings-font {
+      font-family: 'Sora', sans-serif;
+      font-weight: 700;
+    }
+    
+    /* Navbar styling */
+    .navbar {
+      background-color: var(--primary) !important;
+      box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+      padding: 15px 0;
+    }
+    .navbar-brand {
+      font-family: 'Sora', sans-serif;
+      font-weight: 800;
+      font-size: 1.5rem;
+      letter-spacing: -0.5px;
+    }
+    .navbar-brand span {
+      color: var(--accent);
+    }
+    .nav-link {
+      font-weight: 500;
+      color: rgba(255,255,255,0.85) !important;
+      transition: var(--transition);
+    }
+    .nav-link:hover {
+      color: var(--accent) !important;
+    }
+    .btn-accent {
+      background-color: var(--accent);
+      color: #121212;
+      font-weight: 600;
+      border: none;
+      border-radius: 24px;
+      padding: 8px 20px;
+      transition: var(--transition);
+    }
+    .btn-accent:hover {
+      background-color: var(--accent-hover);
+      color: #121212;
+      transform: translateY(-1px);
+    }
+    .btn-outline-custom {
+      border: 1.5px solid rgba(255,255,255,0.3);
+      color: white;
+      font-weight: 500;
+      border-radius: 24px;
+      padding: 7px 18px;
+      transition: var(--transition);
+    }
+    .btn-outline-custom:hover {
+      background-color: rgba(255,255,255,0.1);
+      border-color: white;
+      color: white;
+    }
+    
+    /* Footer */
+    footer {
+      background-color: var(--primary-dark);
+      color: rgba(255, 255, 255, 0.7);
+      margin-top: auto;
+      padding: 40px 0 20px;
+    }
+    footer a {
+      color: rgba(255, 255, 255, 0.7);
+      text-decoration: none;
+      transition: var(--transition);
+    }
+    footer a:hover {
+      color: var(--accent);
+    }
+    
+    /* General styles */
+    .card {
+      border: none;
+      border-radius: 12px;
+      box-shadow: var(--card-shadow);
+      transition: var(--transition);
+    }
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    }
+    .badge-accent {
+      background-color: var(--accent);
+      color: #121212;
+      font-weight: 600;
+    }
+    .text-primary-custom {
+      color: var(--primary);
+    }
+  </style>
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+  <!-- Navigation bar -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+      <a class="navbar-brand" href="{% url 'home' %}">
+        <i class="bi bi-house-door-fill me-1"></i>Hostel<span>Hub</span>
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      
+      <div class="collapse navbar-collapse" id="navbarContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4 gap-2">
+          <li class="nav-item">
+            <a class="nav-link" href="{% url 'hostel_list' %}">Explore Hostels</a>
+          </li>
+        </ul>
+        
+        <ul class="navbar-nav ms-auto align-items-center gap-3">
+          {% if user.is_authenticated %}
+            <li class="nav-item">
+              <span class="nav-link active">
+                <i class="bi bi-person-circle me-1"></i>Hi, {{ user.first_name|default:user.username }}
+              </span>
+            </li>
+            
+            {% if user.profile.role == 'owner' %}
+              <li class="nav-item">
+                <a class="btn btn-outline-custom btn-sm" href="{% url 'owner_dashboard' %}">
+                  <i class="bi bi-speedometer2 me-1"></i>Owner Dashboard
+                </a>
+              </li>
+            {% else %}
+              <li class="nav-item">
+                <a class="btn btn-outline-custom btn-sm" href="{% url 'student_dashboard' %}">
+                  <i class="bi bi-journal-check me-1"></i>My Bookings
+                </a>
+              </li>
+            {% endif %}
+            
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'profile' %}">Profile Settings</a>
+            </li>
+            <li class="nav-item">
+              <a class="btn btn-sm btn-danger px-3 rounded-pill" href="{% url 'logout' %}">
+                <i class="bi bi-box-arrow-right me-1"></i>Logout
+              </a>
+            </li>
+          {% else %}
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'login' %}">Sign In</a>
+            </li>
+            <li class="nav-item">
+              <a class="btn btn-accent" href="{% url 'signup' %}?role=student">Sign Up</a>
+            </li>
+          {% endif %}
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Flash Messages Alert -->
+  {% if messages %}
+    <div class="container mt-4">
+      {% for msg in messages %}
+        <div class="alert alert-{% if msg.tags == 'error' %}danger{% elif msg.tags == 'info' %}primary{% else %}{{ msg.tags }}{% endif %} alert-dismissible fade show border-0 shadow-sm" role="alert">
+          {% if msg.tags == 'success' %}
+            <i class="bi bi-check-circle-fill me-2 text-success"></i>
+          {% elif msg.tags == 'error' %}
+            <i class="bi bi-exclamation-triangle-fill me-2 text-danger"></i>
+          {% else %}
+            <i class="bi bi-info-circle-fill me-2 text-primary"></i>
+          {% endif %}
+          {{ msg }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <!-- Core Content Area -->
+  <main class="flex-grow-1">
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- Footer -->
+  <footer class="text-white-50">
+    <div class="container">
+      <div class="row py-4 border-bottom border-secondary g-4">
+        <div class="col-md-5">
+          <h5 class="text-white mb-3"><i class="bi bi-house-door-fill me-1 text-warning"></i>HostelHub</h5>
+          <p class="small">The ultimate student and traveler hostel listing, discovery, and instant booking platform. Discover quality, vetted shared accommodations with secure booking and automated payments.</p>
+        </div>
+        <div class="col-md-3 offset-md-1">
+          <h6 class="text-white mb-3">Quick Links</h6>
+          <ul class="list-unstyled small d-flex flex-column gap-2">
+            <li><a href="{% url 'hostel_list' %}">Explore PGs & Hostels</a></li>
+            <li><a href="{% url 'signup' %}?role=owner">List Your Property</a></li>
+            <li><a href="{% url 'login' %}">Account Login</a></li>
+          </ul>
+        </div>
+        <div class="col-md-3">
+          <h6 class="text-white mb-3">Support</h6>
+          <ul class="list-unstyled small d-flex flex-column gap-2">
+            <li><a href="#"><i class="bi bi-telephone me-1"></i>+91 99999 88888</a></li>
+            <li><a href="#"><i class="bi bi-envelope me-1"></i>support@hostelhub.com</a></li>
+            <li><a href="#"><i class="bi bi-geo-alt me-1"></i>Koramangala, Bangalore, India</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="text-center py-3 small">
+        <p class="mb-0">&copy; 2026 HostelHub. Built with trust and comfort. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Bootstrap Bundle JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

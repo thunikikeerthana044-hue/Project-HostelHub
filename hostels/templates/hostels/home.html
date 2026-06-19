@@ -1,0 +1,385 @@
+{% extends 'base/base.html' %}
+{% load static %}
+
+{% block title %}HostelHub — Premium Hostel Bookings{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* Hero section with overlay background */
+  .hero-section {
+    background: linear-gradient(135deg, rgba(26, 60, 94, 0.95), rgba(15, 36, 58, 0.98)), url('https://images.unsplash.com/photo-1555854877-bab0e564b8d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80');
+    background-size: cover;
+    background-position: center;
+    padding: 100px 0;
+    color: white;
+    text-align: center;
+  }
+  
+  .hero-title {
+    font-size: 3rem;
+    font-weight: 800;
+    margin-bottom: 20px;
+    letter-spacing: -1px;
+    line-height: 1.2;
+  }
+  
+  .hero-subtitle {
+    font-size: 1.25rem;
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 40px;
+    font-weight: 300;
+  }
+  
+  /* Smart search bar design */
+  .search-card {
+    background: white;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+    max-width: 950px;
+    margin: 0 auto;
+    color: var(--text-dark);
+  }
+  
+  .search-card label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    font-weight: 700;
+    color: #64748B;
+    margin-bottom: 6px;
+    display: block;
+    text-align: left;
+  }
+  
+  .search-card input, .search-card select {
+    border: 1px solid #E2E8F0;
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-weight: 500;
+    font-size: 0.95rem;
+    width: 100%;
+    transition: var(--transition);
+  }
+  
+  .search-card input:focus, .search-card select:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(26, 60, 94, 0.1);
+    outline: none;
+  }
+  
+  .btn-search {
+    background-color: var(--accent);
+    color: #121212;
+    font-weight: 700;
+    padding: 14px;
+    border-radius: 8px;
+    border: none;
+    width: 100%;
+    font-family: 'Sora', sans-serif;
+    transition: var(--transition);
+  }
+  
+  .btn-search:hover {
+    background-color: var(--accent-hover);
+    color: #121212;
+  }
+  
+  /* Quick filters city buttons */
+  .city-badge {
+    background-color: white;
+    border: 1.5px solid #E2E8F0;
+    color: var(--text-dark);
+    padding: 10px 24px;
+    border-radius: 30px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-decoration: none;
+    transition: var(--transition);
+    display: inline-block;
+  }
+  
+  .city-badge:hover {
+    border-color: var(--accent);
+    background-color: rgba(244, 162, 40, 0.05);
+    color: var(--primary);
+    transform: translateY(-2px);
+  }
+  
+  /* Stats banner */
+  .stats-section {
+    background-color: var(--primary);
+    color: white;
+    padding: 50px 0;
+  }
+  
+  .stat-number {
+    font-size: 2.75rem;
+    font-weight: 800;
+    color: var(--accent);
+    margin-bottom: 5px;
+    font-family: 'Sora', sans-serif;
+  }
+  
+  .stat-label {
+    font-size: 0.9rem;
+    color: rgba(255,255,255,0.7);
+    text-transform: uppercase;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+  
+  /* Featured card styling */
+  .hostel-card-home {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    box-shadow: var(--card-shadow);
+    transition: var(--transition);
+  }
+  
+  .hostel-card-home:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.1);
+  }
+  
+  .hostel-card-img {
+    height: 200px;
+    background-color: #E2E8F0;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+  }
+  
+  .gender-tag {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    background: rgba(255,255,255,0.95);
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  }
+  
+  .gender-tag.male { color: #2563EB; }
+  .gender-tag.female { color: #DB2777; }
+  .gender-tag.mixed { color: #7C3AED; }
+  
+  .rating-badge {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: #22C55E;
+    color: white;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 700;
+  }
+  
+  .hostel-card-body {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+  }
+  
+  .hostel-card-price {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--primary);
+  }
+  .hostel-card-price span {
+    font-size: 0.8rem;
+    color: #64748B;
+    font-weight: 400;
+  }
+  
+  /* How It Works step circle */
+  .step-circle {
+    width: 60px;
+    height: 60px;
+    border-radius: 50px;
+    background-color: rgba(26, 60, 94, 0.08);
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0 auto 20px;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section & Search Bar -->
+<section class="hero-section">
+  <div class="container">
+    <h1 class="hero-title">Find Your Perfect Stay Away From Home</h1>
+    <p class="hero-subtitle">Book verified hostels, PGs, and shared spaces instantly.</p>
+    
+    <!-- Smart Search Bar -->
+    <div class="search-card">
+      <form action="{% url 'hostel_list' %}" method="GET">
+        <div class="row g-3 align-items-end">
+          <div class="col-md-4">
+            <label><i class="bi bi-geo-alt-fill me-1 text-primary"></i>Where do you want to stay?</label>
+            <input type="text" name="city" placeholder="Enter city (e.g. Bangalore, Mumbai)" value="{{ city|default:'' }}">
+          </div>
+          <div class="col-md-3">
+            <label><i class="bi bi-gender-ambiguous me-1 text-primary"></i>Gender Type</label>
+            <select name="gender">
+              <option value="">Any Gender Policy</option>
+              <option value="male" {% if gender == 'male' %}selected{% endif %}>Male Only</option>
+              <option value="female" {% if gender == 'female' %}selected{% endif %}>Female Only</option>
+              <option value="mixed" {% if gender == 'mixed' %}selected{% endif %}>Mixed / Co-ed</option>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label><i class="bi bi-wallet2 me-1 text-primary"></i>Max Price (/month)</label>
+            <select name="max_price">
+              <option value="">Any Price</option>
+              <option value="8000">Under ₹8,000</option>
+              <option value="10000">Under ₹10,000</option>
+              <option value="15000">Under ₹15,000</option>
+              <option value="20000">Under ₹20,000</option>
+            </select>
+          </div>
+          <div class="col-md-2">
+            <button type="submit" class="btn-search">
+              <i class="bi bi-search me-1"></i>Search
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- Quick Filters (Cities) -->
+<section class="py-5 bg-white">
+  <div class="container text-center">
+    <h4 class="mb-4">Popular Cities</h4>
+    <div class="d-flex flex-wrap justify-content-center gap-3">
+      <a href="{% url 'hostel_list' %}?city=Bangalore" class="city-badge"><i class="bi bi-pin-angle me-1"></i>Bangalore</a>
+      <a href="{% url 'hostel_list' %}?city=Mumbai" class="city-badge"><i class="bi bi-pin-angle me-1"></i>Mumbai</a>
+      <a href="{% url 'hostel_list' %}?city=Delhi" class="city-badge"><i class="bi bi-pin-angle me-1"></i>Delhi</a>
+      <a href="{% url 'hostel_list' %}?city=Chennai" class="city-badge"><i class="bi bi-pin-angle me-1"></i>Chennai</a>
+      <a href="{% url 'hostel_list' %}?city=Hyderabad" class="city-badge"><i class="bi bi-pin-angle me-1"></i>Hyderabad</a>
+    </div>
+  </div>
+</section>
+
+<!-- Featured Hostels -->
+<section class="py-5">
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-end mb-4">
+      <div>
+        <h2 class="mb-2">Featured Hostels</h2>
+        <p class="text-muted mb-0">Handpicked top-rated stays with quality standards.</p>
+      </div>
+      <a href="{% url 'hostel_list' %}" class="btn btn-outline-primary rounded-pill btn-sm fw-semibold">View All <i class="bi bi-arrow-right"></i></a>
+    </div>
+    
+    <div class="row g-4">
+      {% for hostel in featured_hostels %}
+        <div class="col-md-4">
+          <div class="hostel-card-home">
+            <div class="hostel-card-img" style="background-image: url('{% if hostel.get_main_image %}{{ hostel.get_main_image.image.url }}{% else %}https://images.unsplash.com/photo-1595180401827-c96b4832e541?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80{% endif %}');">
+              <span class="gender-tag {{ hostel.gender_type }}">{{ hostel.get_gender_type_display }}</span>
+              {% if hostel.get_avg_rating %}
+                <span class="rating-badge"><i class="bi bi-star-fill me-1"></i>{{ hostel.get_avg_rating }}</span>
+              {% endif %}
+            </div>
+            <div class="hostel-card-body">
+              <span class="text-muted small mb-1"><i class="bi bi-geo-alt-fill text-danger me-1"></i>{{ hostel.city }}, {{ hostel.state }}</span>
+              <h5 class="card-title text-truncate mb-2">{{ hostel.name }}</h5>
+              <p class="small text-muted flex-grow-1" style="display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">{{ hostel.description }}</p>
+              
+              <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
+                <div class="hostel-card-price">
+                  {% if hostel.get_min_price %}
+                    ₹{{ hostel.get_min_price|floatformat:0 }}<span>/month</span>
+                  {% else %}
+                    <span style="font-size:0.9rem;color:#e11d48">Booking Full</span>
+                  {% endif %}
+                </div>
+                <a href="{% url 'hostel_detail' hostel.id %}" class="btn btn-sm btn-primary rounded-pill px-3">Quick View</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% empty %}
+        <div class="col-12 text-center py-5">
+          <p class="text-muted">No verified hostels listed yet.</p>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- Stats Banner -->
+<section class="stats-section">
+  <div class="container">
+    <div class="row text-center g-4">
+      <div class="col-md-4">
+        <div class="stat-number">{{ stats.hostels_count }}+</div>
+        <div class="stat-label">Verified Listings</div>
+      </div>
+      <div class="col-md-4">
+        <div class="stat-number">{{ stats.cities_count }}+</div>
+        <div class="stat-label">Cities Covered</div>
+      </div>
+      <div class="col-md-4">
+        <div class="stat-number">{{ stats.bookings_count }}+</div>
+        <div class="stat-label">Successful Bookings</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- How It Works -->
+<section class="py-5 bg-white">
+  <div class="container">
+    <h2 class="text-center mb-5">How It Works</h2>
+    <div class="row g-4 text-center">
+      <div class="col-md-4">
+        <div class="step-circle">1</div>
+        <h5 class="mb-3">Search and Compare</h5>
+        <p class="text-muted small px-3">Filter by location, price, amenities, and room sharing options to find your ideal stay.</p>
+      </div>
+      <div class="col-md-4">
+        <div class="step-circle">2</div>
+        <h5 class="mb-3">Secure Token Booking</h5>
+        <p class="text-muted small px-3">Select your move-in date and lock-in period, pay securely via Razorpay to confirm bookings.</p>
+      </div>
+      <div class="col-md-4">
+        <div class="step-circle">3</div>
+        <h5 class="mb-3">Move-In Peacefully</h5>
+        <p class="text-muted small px-3">Receive instant confirmation, check-in instructions, and directly connect with your landlord.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Owner Call to Action -->
+<section class="py-5 bg-light border-top">
+  <div class="container">
+    <div class="p-5 bg-dark text-white rounded-4 shadow-lg d-flex flex-column flex-md-row justify-content-between align-items-center gap-4">
+      <div>
+        <h2 class="text-warning mb-2" style="font-family:'Sora',sans-serif">List Your Property on HostelHub!</h2>
+        <p class="mb-0 text-white-50">Are you a hostel owner or landlord? Start listing your properties and get verified leads in minutes.</p>
+      </div>
+      <div>
+        <a href="{% url 'signup' %}?role=owner" class="btn btn-accent btn-lg px-4 rounded-pill">List For Free <i class="bi bi-arrow-right-short ms-1"></i></a>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

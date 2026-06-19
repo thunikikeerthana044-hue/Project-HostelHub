@@ -1,0 +1,95 @@
+{% extends 'base/base.html' %}
+
+{% block title %}List Your Property — HostelHub{% endblock %}
+
+{% block content %}
+<div class="container py-5" style="max-width: 800px;">
+  <div class="card p-5 border-0 shadow-sm bg-white rounded-4">
+    <h2 class="headings-font mb-2 text-center text-primary-custom">List Your Property</h2>
+    <p class="text-muted text-center mb-5">Create a free listing on HostelHub and get verified reservations instantly.</p>
+    
+    <form method="POST" enctype="multipart/form-data">
+      {% csrf_token %}
+      
+      <!-- Basic Details -->
+      <h5 class="border-bottom pb-2 mb-3"><i class="bi bi-info-circle text-primary me-2"></i>Basic Information</h5>
+      <div class="row g-3 mb-4">
+        <div class="col-12">
+          <label class="form-label text-muted small uppercase fw-bold">Hostel / PG Name</label>
+          <input type="text" name="name" class="form-control" placeholder="e.g. Starlight Luxury PG" required>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label text-muted small uppercase fw-bold">Phone Number</label>
+          <input type="text" name="phone" class="form-control" placeholder="e.g. +91 99999 88888" required>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label text-muted small uppercase fw-bold">Contact Email</label>
+          <input type="email" name="email" class="form-control" placeholder="e.g. contact@starlightpg.com">
+        </div>
+        <div class="col-12">
+          <label class="form-label text-muted small uppercase fw-bold">Description</label>
+          <textarea name="description" class="form-control" rows="4" placeholder="Detail the proximity to colleges, IT corridors, foods, timings, policies..." required></textarea>
+        </div>
+      </div>
+      
+      <!-- Address Details -->
+      <h5 class="border-bottom pb-2 mb-3"><i class="bi bi-geo-alt text-primary me-2"></i>Location Details</h5>
+      <div class="row g-3 mb-4">
+        <div class="col-12">
+          <label class="form-label text-muted small uppercase fw-bold">Full Address</label>
+          <input type="text" name="address" class="form-control" placeholder="Plot No. 12, Sector 2..." required>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label text-muted small uppercase fw-bold">City</label>
+          <input type="text" name="city" class="form-control" placeholder="e.g. Bangalore" required>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label text-muted small uppercase fw-bold">State</label>
+          <input type="text" name="state" class="form-control" placeholder="e.g. Karnataka" required>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label text-muted small uppercase fw-bold">Pincode</label>
+          <input type="text" name="pincode" class="form-control" placeholder="e.g. 560034" required>
+        </div>
+      </div>
+
+      <!-- Settings & Policy -->
+      <h5 class="border-bottom pb-2 mb-3"><i class="bi bi-shield-check text-primary me-2"></i>Policy & Photos</h5>
+      <div class="row g-3 mb-4">
+        <div class="col-md-6">
+          <label class="form-label text-muted small uppercase fw-bold">Gender Preference Type</label>
+          <select name="gender_type" class="form-select" required>
+            <option value="mixed">Mixed / Co-ed</option>
+            <option value="male">Male Only</option>
+            <option value="female">Female Only</option>
+          </select>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label text-muted small uppercase fw-bold">Cover Photo Upload</label>
+          <input type="file" name="main_image" class="form-control" accept="image/*">
+        </div>
+      </div>
+      
+      <!-- Amenities list checkboxes -->
+      <h5 class="border-bottom pb-2 mb-3"><i class="bi bi-card-checklist text-primary me-2"></i>Available Amenities</h5>
+      <div class="row g-3 mb-5">
+        {% for amenity in amenities %}
+          <div class="col-sm-6 col-md-4">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" name="amenities" value="{{ amenity.id }}" id="am_form_{{ amenity.id }}">
+              <label class="form-check-label small" for="am_form_{{ amenity.id }}">
+                <i class="{{ amenity.icon }} me-1 text-secondary"></i>{{ amenity.name }}
+              </label>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+
+      <div class="d-flex justify-content-between gap-3 border-top pt-4">
+        <a href="{% url 'owner_dashboard' %}" class="btn btn-outline-secondary rounded-pill px-4">Cancel</a>
+        <button type="submit" class="btn btn-accent rounded-pill px-5 fw-semibold">Publish Property Listing</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

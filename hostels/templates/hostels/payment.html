@@ -1,0 +1,213 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Complete Payment — HostelHub{% endblock %}
+
+{% block extra_css %}
+<style>
+  body { background-color: var(--bg-light); }
+  .pay-card {
+    background: white; 
+    border: 1px solid #E2E8F0;
+    border-radius: 20px; 
+    padding: 40px;
+    max-width: 480px; 
+    margin: 60px auto;
+    box-shadow: var(--card-shadow);
+  }
+  .amount-display {
+    font-size: 3rem; 
+    font-family: 'Sora', sans-serif;
+    font-weight: 800; 
+    color: var(--primary);
+    text-align: center; 
+    margin: 24px 0 8px;
+  }
+  .amount-label { text-align: center; color: #64748B; font-size: 14px; margin-bottom: 32px; }
+  .detail-row {
+    display: flex; justify-content: space-between;
+    padding: 12px 0; border-bottom: 1px solid #F1F5F9;
+    font-size: 14px;
+  }
+  .detail-row:last-child { border-bottom: none; }
+  .detail-key { color: #64748B; }
+  .detail-val { color: var(--text-dark); font-weight: 600; }
+  
+  .pay-btn {
+    width: 100%; 
+    padding: 16px; 
+    margin-top: 28px;
+    background-color: var(--accent);
+    border: none; 
+    border-radius: 12px; 
+    color: #121212;
+    font-family: 'Sora', sans-serif; 
+    font-size: 1.1rem;
+    font-weight: 700; 
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(244, 162, 40, 0.2);
+    transition: var(--transition);
+  }
+  .pay-btn:hover { 
+    background-color: var(--accent-hover);
+    transform: translateY(-1px);
+  }
+  
+  .secure-note {
+    text-align: center; color: #64748B; font-size: 12px;
+    margin-top: 18px; display: flex; align-items: center;
+    justify-content: center; gap: 6px;
+  }
+  .spinner { display: none; text-align: center; padding: 20px; color: #64748B; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="pay-card">
+  <p style="text-align:center;color:#64748B;font-size:13px;text-transform:uppercase;letter-spacing:.08em;font-weight:700">
+    Complete your booking
+  </p>
+
+  <div class="amount-display">₹{{ amount_display|floatformat:0 }}</div>
+  <div class="amount-label">Total token amount for your stay</div>
+
+  <div class="p-3 bg-light rounded-3">
+    <div class="detail-row">
+      <span class="detail-key">Hostel</span>
+      <span class="detail-val text-truncate" style="max-width: 200px;">{{ room.hostel.name }}</span>
+    </div>
+    <div class="detail-row">
+      <span class="detail-key">Room type</span>
+      <span class="detail-val">{{ room.get_room_type_display }}</span>
+    </div>
+    <div class="detail-row">
+      <span class="detail-key">Check-in</span>
+      <span class="detail-val">{{ booking.check_in_date }}</span>
+    </div>
+    <div class="detail-row">
+      <span class="detail-key">Check-out</span>
+      <span class="detail-val">{{ booking.check_out_date }}</span>
+    </div>
+    <div class="detail-row">
+      <span class="detail-key">Booking ID</span>
+      <span class="detail-val" style="font-size:12px;opacity:.7">{{ booking.razorpay_order_id }}</span>
+    </div>
+  </div>
+
+  {% if is_mock %}
+    <div class="alert alert-warning py-2 px-3 mt-3 small" role="alert">
+      <i class="bi bi-info-circle-fill me-1"></i>Razorpay Keys not configured in system. Running in <strong>Simulated Checkout Mode</strong>.
+    </div>
+  {% endif %}
+
+  <button class="pay-btn" id="payBtn" onclick="openRazorpay()">
+    {% if is_mock %}Simulate Sandbox Payment →{% else %}Pay ₹{{ amount_display|floatformat:0 }} securely →{% endif %}
+  </button>
+
+  <div class="spinner" id="spinner">
+    <div class="spinner-border spinner-border-sm text-primary me-2" role="status"></div>
+    Processing payment...
+  </div>
+
+  <p class="secure-note">
+    🔒 Secured checkout · 256-bit SSL encryption
+  </p>
+</div>
+
+<!-- Razorpay checkout script -->
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+  function openRazorpay() {
+    document.getElementById('payBtn').style.display = 'none';
+    document.getElementById('spinner').style.display = 'block';
+
+    {% if is_mock %}
+    // Simulate API callback delay, then call verification endpoint
+    setTimeout(function() {
+      fetch('{% url "verify_payment" %}', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          razorpay_order_id:   '{{ razorpay_order_id }}',
+          razorpay_payment_id: 'pay_mock_' + Math.random().toString(36).substring(2, 12),
+          razorpay_signature:  'mock_signature',
+        })
+      })
+      .then(res => {
+        if (!res.ok) throw new Error("Verification failed");
+        return res.json();
+      })
+      .then(data => {
+        if (data.status === 'success') {
+          // Redirect to dynamic success template path
+          window.location.href = "{% url 'booking_success' 999999 %}".replace('999999', data.booking_id);
+        } else {
+          window.location.href = "{% url 'booking_failed' %}";
+        }
+      })
+      .catch(err => {
+        window.location.href = "{% url 'booking_failed' %}";
+      });
+    }, 1500);
+
+    {% else %}
+    // Standard Live/Test Razorpay setup
+    var options = {
+      key:         '{{ razorpay_key }}',
+      amount:      '{{ amount_paise }}',
+      currency:    'INR',
+      name:        'HostelHub',
+      description: '{{ room.hostel.name }} — {{ room.get_room_type_display }}',
+      order_id:    '{{ razorpay_order_id }}',
+      image:       'https://cdn-icons-png.flaticon.com/512/2942/2942928.png',
+
+      prefill: {
+        name:    '{{ request.user.get_full_name }}',
+        email:   '{{ request.user.email }}',
+        contact: '{{ request.user.profile.phone }}',
+      },
+
+      theme: { color: '#1A3C5E' },
+
+      handler: function(response) {
+        fetch('{% url "verify_payment" %}', {
+          method:  'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            razorpay_order_id:   response.razorpay_order_id,
+            razorpay_payment_id: response.razorpay_payment_id,
+            razorpay_signature:  response.razorpay_signature,
+          })
+        })
+        .then(res => {
+          if (!res.ok) throw new Error("Failed");
+          return res.json();
+        })
+        .then(data => {
+          if (data.status === 'success') {
+            window.location.href = "{% url 'booking_success' 999999 %}".replace('999999', data.booking_id);
+          } else {
+            window.location.href = "{% url 'booking_failed' %}";
+          }
+        })
+        .catch(err => {
+          window.location.href = "{% url 'booking_failed' %}";
+        });
+      },
+
+      modal: {
+        ondismiss: function() {
+          document.getElementById('payBtn').style.display = 'block';
+          document.getElementById('spinner').style.display = 'none';
+        }
+      }
+    };
+
+    var rzp = new Razorpay(options);
+    rzp.on('payment.failed', function(response) {
+      window.location.href = "{% url 'booking_failed' %}";
+    });
+    rzp.open();
+    {% endif %}
+  }
+</script>
+{% endblock %}

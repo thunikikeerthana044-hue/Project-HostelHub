@@ -1,0 +1,65 @@
+{% extends 'base/base.html' %}
+{% block title %}Login — HostelHub{% endblock %}
+
+{% block extra_css %}
+<style>
+  body { background: #0a0a0f; }
+  .auth-card {
+    background: #1a1a26; border: 1px solid #2a2a3d;
+    border-radius: 24px; padding: 40px;
+    box-shadow: 0 0 60px rgba(124,106,255,.1);
+  }
+  .form-control {
+    background: rgba(255,255,255,.05); border: 1.5px solid #2a2a3d;
+    color: #f0eeff; border-radius: 11px; padding: 12px 16px;
+  }
+  .form-control:focus {
+    background: rgba(124,106,255,.07); border-color: #7c6aff;
+    color: #f0eeff; box-shadow: 0 0 0 3px rgba(124,106,255,.15);
+  }
+  .form-label { color: #7a7890; font-size: 12px;
+    text-transform: uppercase; letter-spacing: .06em; font-weight: 500; }
+  .btn-login {
+    background: linear-gradient(135deg,#7c6aff,#ff6a9d);
+    border: none; border-radius: 12px; padding: 14px;
+    font-family: 'Syne',sans-serif; font-weight: 700;
+    font-size: 16px; width: 100%; color: white;
+  }
+  .auth-link { color: #7c6aff; text-decoration: none; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-5 col-lg-4">
+      <div class="text-center mb-4">
+        <h1 class="text-white" style="font-family:Syne,sans-serif;font-weight:800">🏠 HostelHub</h1>
+        <p class="text-secondary">Welcome back</p>
+      </div>
+      <div class="auth-card">
+        <form method="POST">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label class="form-label">Username</label>
+            <input type="text" name="username" class="form-control" placeholder="your_username" required autofocus>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Password</label>
+            <input type="password" name="password" class="form-control" placeholder="Your password" required>
+          </div>
+          {% if form.errors %}
+          <div class="alert alert-danger py-2" style="font-size:13px;border-radius:10px">
+            Invalid username or password.
+          </div>
+          {% endif %}
+          <button type="submit" class="btn-login mt-2">Sign in to HostelHub</button>
+          <p class="text-center mt-3" style="font-size:13px;color:#7a7890">
+            No account yet? <a href="{% url 'signup' %}" class="auth-link">Create one free</a>
+          </p>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

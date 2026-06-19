@@ -1,0 +1,58 @@
+{% extends 'base/base.html' %}
+
+{% block title %}Add Room Option — {{ hostel.name }}{% endblock %}
+
+{% block content %}
+<div class="container py-5" style="max-width: 600px;">
+  <div class="card p-5 border-0 shadow-sm bg-white rounded-4">
+    <h3 class="headings-font mb-2 text-center text-primary-custom">Add Room Option</h3>
+    <p class="text-muted text-center mb-4">Hostel: <strong>{{ hostel.name }}</strong></p>
+    
+    <form method="POST">
+      {% csrf_token %}
+      
+      <div class="mb-3">
+        <label class="form-label text-muted small uppercase fw-bold">Room Category Type</label>
+        <select name="room_type" class="form-select" required>
+          <option value="single">Single Room</option>
+          <option value="double">Double Sharing</option>
+          <option value="triple">Triple Sharing</option>
+          <option value="dormitory">Dormitory (4+ beds)</option>
+        </select>
+      </div>
+      
+      <div class="mb-3">
+        <label class="form-label text-muted small uppercase fw-bold">Bed Sharing Capacity</label>
+        <input type="number" name="capacity" class="form-control" min="1" value="1" placeholder="e.g. 2 for twin bed sharing" required>
+      </div>
+
+      <div class="row g-3 mb-3">
+        <div class="col-md-6">
+          <label class="form-label text-muted small uppercase fw-bold">Rent Per Month (₹)</label>
+          <input type="number" name="price_per_month" class="form-control" min="0" step="100" placeholder="e.g. 8500" required>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label text-muted small uppercase fw-bold">Security Deposit (₹)</label>
+          <input type="number" name="deposit_amount" class="form-control" min="0" step="100" value="0" placeholder="e.g. 15000">
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label text-muted small uppercase fw-bold">Total Rooms of This Type</label>
+        <input type="number" name="total_rooms" class="form-control" min="1" value="1" required>
+        <small class="text-muted" style="font-size:0.75rem">How many identical rooms are available for bookings in your hostel.</small>
+      </div>
+      
+      <div class="mb-4">
+        <label class="form-label text-muted small uppercase fw-bold">Room Description</label>
+        <textarea name="description" class="form-control" rows="3" placeholder="e.g. Private balcony, premium mattresses, study desks, AC, attached bathroom..."></textarea>
+      </div>
+
+      <div class="d-flex justify-content-between gap-3 border-top pt-4">
+        <a href="{% url 'owner_dashboard' %}" class="btn btn-outline-secondary rounded-pill px-4">Cancel</a>
+        <button type="submit" class="btn btn-primary rounded-pill px-4 fw-semibold">Add Room Option</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
